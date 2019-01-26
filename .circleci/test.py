@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import requests
-import json
-import datetime
-import shutil
 
 # The drivers must be on path
 here = os.path.dirname(os.path.abspath(__file__))
