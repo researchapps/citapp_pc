@@ -1,4 +1,8 @@
+var test_complete = false;
+var valid_test = true;
+
 function dev_test(do_sim = 99) {
+
     var valid_test = true;
     // initiate task using demo data
     if ( do_sim == 1 ) { // set to standard version if selected
@@ -56,4 +60,5 @@ function dev_test(do_sim = 99) {
     } else { // otherwise, show instructions
         $('#instructions').show();
     }
+
 }

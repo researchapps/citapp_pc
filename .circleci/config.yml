@@ -1,0 +1,69 @@
+version: 2
+
+# Defaults
+defaults: &defaults
+  working_directory: /tmp/src
+  docker:
+    - image: circleci/python:3.6.4
+      environment:
+        PIPENV_VENV_IN_PROJECT: true
+        PYTHON_PORT: 9999
+
+
+# Installation
+install: &install
+    name: Install Python dependencies
+    command: |
+       sudo pip install pipenv
+       pipenv install
+
+# Environment
+runtest: &runtest
+    name: Run the tests
+    command: |
+       cd /tmp/src/
+       python -m http.server ${PYTHON_PORT} &
+       cd /tmp/src/.circleci
+       pipenv run "python test.py ${PYTHON_PORT}"
+
+
+################################################################################
+# Jobs
+################################################################################
+
+jobs: 
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - restore_cache:
+          key: deps-{{ .Branch }}
+      - run: *install
+      - save_cache:
+          key: deps-{{ .Branch }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.6/site-packages"
+      - run: *runtest
+
+
+################################################################################
+# Workflows
+################################################################################
+
+
+workflows:
+  version: 2
+  test_static:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+                - master
+            tags:
+              only: /.*/
